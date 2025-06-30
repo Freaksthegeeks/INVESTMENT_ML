@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Investment Prediction</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Investment Prediction Form</h1>
+        <form method="post" action="/predict">
+            <label>Income:</label>
+            <input type="number" name="income" step="any" required><br>
+
+            <label>Investment Amount:</label>
+            <input type="number" name="investment_amount" step="any" required><br>
+
+            <label>Investment to Income Ratio:</label>
+            <input type="number" name="investment_to_income_ratio" step="any" required><br>
+
+            <label>Risk Score:</label>
+            <input type="number" name="risk_score" step="any" required><br>
+
+            <label>Liquidity Preference:</label>
+            <input type="number" name="liquidity_preference" step="any" required><br>
+
+            <label>Investment Experience (0/1):</label>
+            <input type="number" name="investment_experience" min="0" max="1" required><br>
+
+            <label>Age Bucket Encoded:</label>
+            <input type="number" name="age_bucket_encoded" required><br>
+
+            <button type="submit">Predict</button>
+        </form>
+
+        {% if result_objective %}
+        <div class="result">
+            <h2>Prediction Result</h2>
+            <p><strong>Objective:</strong> {{ result_objective }}</p>
+            <p><strong>Expected Return:</strong> {{ result_return }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
