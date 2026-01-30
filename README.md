@@ -80,18 +80,20 @@ The response is HTML (the same form page with results filled in).
 
 ```mermaid
 flowchart LR
-  U[User (browser)] -->|visit| F[Frontend: templates/index.html]
-  F -->|form submit| S[FastAPI app (main.py / uvicorn)]
-  S --> P[Preprocessor (input validation & feature prep)]
-  P --> CM[Classification model - classification_model.pkl]
-  P --> RM[Regression model - regression_model.pkl]
+  U[User Browser] -->|visit| F[Frontend templates index html]
+  F -->|form submit| S[FastAPI app main py uvicorn]
+  S --> P[Preprocessor input validation and feature prep]
+  P --> CM[Classification model classification_model pkl]
+  P --> RM[Regression model regression_model pkl]
   CM --> R1[Objective prediction]
   RM --> R2[Estimated annual return]
-  R2 --> G[Compute 10-year projection (chart generation)]
-  R1 & G --> V[Render results in templates/index.html]
-  S -->|serves static| ST[static/ (css, js, images)]
-  NB[INVESTMENT_OPTION.ipynb (training notebook)] -->|produces| CM
+  R2 --> G[Compute 10 year projection chart generation]
+  R1 --> V[Render results in template]
+  G --> V
+  S -->|serves static| ST[Static assets css js images]
+  NB[Training notebook INVESTMENT OPTION ipynb] -->|produces| CM
   NB -->|produces| RM
+
 ```
 
 Architecture notes:
