@@ -66,31 +66,42 @@ The response is HTML (the same form page with results filled in).
 
 ---
 
-## 🏗️ Architecture (Mermaid flow diagram)
 
-```mermaid
-flowchart LR
-  U[User] -->|visit| F[Frontend: index.html]
-  F -->|form submit| S[FastAPI Server]
-  S --> P[Preprocessor]
-  P --> CM[Classification model (classification_model.pkl)]
-  P --> RM[Regression model (regression_model.pkl)]
-  CM --> R1[Objective prediction]
-  RM --> R2[Estimated annual return]
-  R2 --> G[Compute 10-year projection]
-  R1 & G --> V[Render results in templates/index.html]
-  S -->|static files| ST[static/]
-```
 
-> Note: GitHub supports rendering Mermaid diagrams. If your viewer doesn't render them, try the VS Code "Markdown Preview Mermaid Support" extension or paste the diagram into https://mermaid.live/
 
----
 
 ## 💡 Tips & next steps
 
 - Add example data pre-filled in the form (`templates/index.html`) for demonstration
 - Add unit tests for model prediction code and a CI workflow
 - Add an API-only JSON endpoint if you want programmatic JSON responses instead of HTML
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart LR
+  U[User (browser)] -->|visit| F[Frontend: templates/index.html]
+  F -->|form submit| S[FastAPI app (main.py / uvicorn)]
+  S --> P[Preprocessor (input validation & feature prep)]
+  P --> CM[Classification model - classification_model.pkl]
+  P --> RM[Regression model - regression_model.pkl]
+  CM --> R1[Objective prediction]
+  RM --> R2[Estimated annual return]
+  R2 --> G[Compute 10-year projection (chart generation)]
+  R1 & G --> V[Render results in templates/index.html]
+  S -->|serves static| ST[static/ (css, js, images)]
+  NB[INVESTMENT_OPTION.ipynb (training notebook)] -->|produces| CM
+  NB -->|produces| RM
+```
+
+Architecture notes:
+
+- `templates/index.html`: web form and results template served by FastAPI.
+- `main.py`: FastAPI app and endpoints; loads models and performs preprocessing.
+- `classification_model.pkl`, `regression_model.pkl`: trained model artifacts (repo root).
+- `static/`: static assets (styles and client-side scripts).
+- `INVESTMENT_OPTION.ipynb`: notebook used to explore data and train the models.
+- Predictions flow: browser -> FastAPI -> preprocessor -> models -> results rendered back to template.
 
 ---
 
