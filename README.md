@@ -73,12 +73,12 @@ flowchart LR
   U[User] -->|visit| F[Frontend: index.html]
   F -->|form submit| S[FastAPI Server]
   S --> P[Preprocessor]
-  P --> CM[Classification model\n(`classification_model.pkl`) ]
-  P --> RM[Regression model\n(`regression_model.pkl`) ]
+  P --> CM[Classification model (classification_model.pkl)]
+  P --> RM[Regression model (regression_model.pkl)]
   CM --> R1[Objective prediction]
   RM --> R2[Estimated annual return]
   R2 --> G[Compute 10-year projection]
-  R1 & G --> V[Render results in `templates/index.html`]
+  R1 & G --> V[Render results in templates/index.html]
   S -->|static files| ST[static/]
 ```
 
