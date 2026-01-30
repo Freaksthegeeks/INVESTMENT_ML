@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import joblib
 import numpy as np
+import json
 
 app = FastAPI()
 
@@ -49,9 +50,25 @@ def predict(
     # Predict
     objective_pred = classification_model.predict(input_data)[0]
     return_pct_pred = regression_model.predict(input_data)[0]
+    # Create a 10-year projection for the invested amount using the predicted annual return
+    years = list(range(0, 11))
+    try:
+        factor = 1 + float(return_pct_pred) / 100.0
+    except Exception:
+        factor = 1.0
+    values = [(investment_amount * (factor ** y)) for y in years]
+    chart_data = [{"year": int(y), "value": float(v)} for y, v in zip(years, values)]
+
+    explanation = (
+        f"Predicted objective: {objective_labels.get(objective_pred, 'Unknown')}. "
+        f"Estimated annual return: {return_pct_pred:.2f}%. "
+        "The chart shows projected growth of the invested amount over 10 years (compounded annually)."
+    )
 
     return templates.TemplateResponse("index.html", {
         "request": request,
         "result_objective": objective_labels.get(objective_pred, "Unknown"),
         "result_return": f"{return_pct_pred:.2f}%",
+        "chart_data": json.dumps(chart_data),
+        "result_explanation": explanation,
     })

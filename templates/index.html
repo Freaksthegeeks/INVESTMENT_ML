@@ -3,41 +3,120 @@
 <head>
     <title>Investment Prediction</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Investment Prediction Form</h1>
+        <h1>Investment Prediction</h1>
+        <p class="lead">Quick guidance is shown for numeric encodings so you can enter values confidently.</p>
+
         <form method="post" action="/predict">
-            <label>Income:</label>
-            <input type="number" name="income" step="any" required><br>
+            <label>Income (annual, in your currency):</label>
+            <input type="number" name="income" step="any" placeholder="e.g. 50000" required>
+            <small class="help">Enter your gross annual income. Example: 50000</small>
 
-            <label>Investment Amount:</label>
-            <input type="number" name="investment_amount" step="any" required><br>
+            <label>Investment Amount (amount you plan to invest):</label>
+            <input type="number" name="investment_amount" step="any" placeholder="e.g. 10000" required>
+            <small class="help">Total amount you intend to invest today.</small>
 
-            <label>Investment to Income Ratio:</label>
-            <input type="number" name="investment_to_income_ratio" step="any" required><br>
+            <label>Investment to Income Ratio (percentage):</label>
+            <input type="number" name="investment_to_income_ratio" step="any" placeholder="e.g. 20" required>
+            <small class="help">Percentage of income you invest (0-100). Example: 20</small>
 
-            <label>Risk Score:</label>
-            <input type="number" name="risk_score" step="any" required><br>
+            <label>Risk Score (1-10):</label>
+            <input type="number" name="risk_score" step="1" min="1" max="10" placeholder="5" required>
+            <small class="help">1 = very conservative, 10 = very aggressive.</small>
 
             <label>Liquidity Preference:</label>
-            <input type="number" name="liquidity_preference" step="any" required><br>
+            <select name="liquidity_preference" required>
+                <option value="0">0 — Low (prefer long-term, less liquid)</option>
+                <option value="1">1 — Medium (balanced liquidity)</option>
+                <option value="2">2 — High (need easy access to cash)</option>
+            </select>
+            <small class="help">Choose how important access to cash is for you.</small>
 
-            <label>Investment Experience (0/1):</label>
-            <input type="number" name="investment_experience" min="0" max="1" required><br>
+            <label>Investment Experience:</label>
+            <select name="investment_experience" required>
+                <option value="0">0 — Beginner (little or no experience)</option>
+                <option value="1">1 — Experienced (familiar with investments)</option>
+            </select>
+            <small class="help">Select whether you have prior investment experience.</small>
 
-            <label>Age Bucket Encoded:</label>
-            <input type="number" name="age_bucket_encoded" required><br>
+            <label>Age Bucket:</label>
+            <select name="age_bucket_encoded" required>
+                <option value="0">0 — &lt; 25 years</option>
+                <option value="1">1 — 25–34 years</option>
+                <option value="2">2 — 35–44 years</option>
+                <option value="3">3 — 45–54 years</option>
+                <option value="4">4 — 55+ years</option>
+            </select>
+            <small class="help">Pick the bucket that matches your age.</small>
 
-            <button type="submit">Predict</button>
+            <button type="submit" class="btn">Predict</button>
         </form>
+
+        <section class="explain">
+            <h3>Input guidance</h3>
+            <p>Use the helper text beneath each field to choose appropriate numeric values. The model uses the encodings shown and projects growth based on the predicted return.</p>
+            <ul>
+                <li><strong>Liquidity Preference:</strong> 0 = Low (long-term), 1 = Medium, 2 = High (need cash)</li>
+                <li><strong>Age Bucket:</strong> 0=&lt;25, 1=25–34, 2=35–44, 3=45–54, 4=55+</li>
+                <li><strong>Investment Experience:</strong> 0 = Beginner, 1 = Experienced</li>
+                <li><strong>Risk Score:</strong> 1 (conservative) — 10 (aggressive)</li>
+            </ul>
+        </section>
 
         {% if result_objective %}
         <div class="result">
             <h2>Prediction Result</h2>
             <p><strong>Objective:</strong> {{ result_objective }}</p>
             <p><strong>Expected Return:</strong> {{ result_return }}</p>
+            <p class="explain-text">{{ result_explanation }}</p>
         </div>
+
+        <div id="chart-wrapper">
+            <h3>Projected Growth (10 years)</h3>
+            <div id="chart" class="chart"></div>
+        </div>
+
+        <script>
+            const chartData = {{ chart_data | safe }};
+            (function(){
+                const years = chartData.map(d => d.year);
+                const values = chartData.map(d => d.value);
+
+                const trace = {
+                    x: years,
+                    y: values.map(v => v),
+                    mode: 'lines+markers',
+                    line: {color: '#007bff', width: 3},
+                    marker: {size: 6}
+                };
+
+                const layout = {
+                    margin: {t: 30, r: 20, l: 50, b: 40},
+                    plot_bgcolor: '#f8f9fb',
+                    paper_bgcolor: 'transparent',
+                    xaxis: {title: 'Year'},
+                    yaxis: {title: 'Portfolio Value'},
+                    transition: {duration: 500, easing: 'cubic-in-out'}
+                };
+
+                const frames = years.map((y, i) => ({
+                    name: String(y),
+                    data: [{x: years.slice(0, i+1), y: values.slice(0, i+1)}]
+                }));
+
+                Plotly.newPlot('chart', [trace], layout).then(function(){
+                    Plotly.addFrames('chart', frames).then(() => {
+                        Plotly.animate('chart', frames.map(f => f.name), {
+                            frame: {duration: 300, redraw: false},
+                            transition: {duration: 250, easing: 'linear'}
+                        });
+                    });
+                });
+            })();
+        </script>
         {% endif %}
     </div>
 </body>

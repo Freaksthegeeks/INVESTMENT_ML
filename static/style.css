@@ -1,13 +1,13 @@
 body {
     font-family: Arial, sans-serif;
-    background: #f0f4f8;
+    background: linear-gradient(180deg, #f4f6f8 0%, #eef2f6 100%);
     padding: 20px;
 }
 
 .container {
     max-width: 600px;
     margin: auto;
-    background: white;
+    background: #ffffff;
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 0 10px #aaa;
@@ -19,6 +19,34 @@ input, select {
     margin-bottom: 15px;
     border-radius: 4px;
     border: 1px solid #ccc;
+}
+
+label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+
+small.help {
+    display: block;
+    color: #555;
+    margin-top: -10px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+}
+
+.lead {
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.btn {
+    padding: 10px 16px;
+    background: #0069d9;
+    color: #fff;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
 }
 
 button {
@@ -33,6 +61,13 @@ button {
 .result {
     margin-top: 20px;
     padding: 15px;
-    background: #e0f7fa;
-    border-left: 5px solid #007bff;
+    background: linear-gradient(90deg,#e9f2ff 0%, #f7fafc 100%);
+    border-left: 5px solid #0056b3;
 }
+
+#chart-wrapper { margin-top: 18px; }
+.chart { height: 320px; }
+
+/* subtle fade-in for result and chart */
+.result, #chart-wrapper { animation: fadeIn 600ms ease both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
